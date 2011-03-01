@@ -1,0 +1,12 @@
+So this is just barebones code so it doesn't really need a license of any kind
+but in case someone cares it's under GNU LGPL v3, in order to match the
+liscense from the ccrc32.c and ccrc32.h files.
+
+Those did not include any license file or comment illucidating the fact that
+it has this license (like author info), but I downloaded the code from here:
+http://www.networkdls.com/Software.Asp?Review=22
+
+And it was noted as being GNU LGPL v3.
+
+--Kit Scuzz
+Copyright 2011
