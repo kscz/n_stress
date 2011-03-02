@@ -12,7 +12,7 @@
 
 /* The global variables */
 static int lastgood= 1;
-static unsigned int pcount= 0;
+static unsigned int preccount= 0, psndcount= 0;
 static size_t bufsize= DEFAULT_BUFSZ;
 
 /* Some stuff which is easy to identify in a packet dump */
@@ -174,13 +174,20 @@ void *send_check(void *fd)
         while(n < max && ret > 0)
             n+= ret= write(ourfd, buffer + n, max - n);
 
+        psndcount++;
+
+        if(ret == 0) {
+            fprintf(stderr, "Stopped writing!\n");
+            break;
+        }
+
         if(ret < 0)
             error("ERROR writing to socket\n");
     }
 
     free(buffer); /* Clean up after ourselves! */
 
-    return NULL;
+    return (void *)&psndcount;
 } /* }}} */
 
 /* {{{ recv_check - Function called by pthread_create to receive and check packets
@@ -195,11 +202,11 @@ void *recv_check(void *fd)
 
     if(buffer == NULL) {
         printf("Could not allocate space for receive buffer!\n");
-        pcount= -1;
-        return (void *)&pcount;
+        preccount= -1;
+        return (void *)&preccount;
     }
 
-    pcount= 0;
+    preccount= 0;
 
     /* Loop until we receive bad data */
     while(lastgood) {
@@ -212,7 +219,7 @@ void *recv_check(void *fd)
         if(ret < 0)
             error("ERROR reading from socket\n");
 
-        pcount++; /* indicate we got another packet */
+        preccount++; /* indicate we got another packet */
         lastgood= !parse_packet(buffer, n); /* check if it's good */
     }
 
@@ -223,5 +230,5 @@ void *recv_check(void *fd)
     free(buffer); /* Clean up after ourselves! */
 
     /* return the number of packets we got */
-    return (void *)&pcount;
+    return (void *)&preccount;
 } /* }}} */
