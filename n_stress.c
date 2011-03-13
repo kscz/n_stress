@@ -38,13 +38,14 @@ int main(int argc, char *argv[]) {
     if (argc < 2 || argc > 9) {
         fprintf(stderr,"Usage: %s [-l portnum] [-ro] [-wo] [-c host portnum] \
 [-bs buffer size]\n", argv[0]);
-        fprintf(stderr,"Network stress tester - sends packets with a repeating \
-value and a crc32 until it receives a mismatch between the received and sent crc\n");
-        fprintf(stderr,"-ro == read only\n");
-        fprintf(stderr,"-wo == write only\n");
-        fprintf(stderr,"-l == listen on port# given\n");
-        fprintf(stderr,"-c == connect to host on port# given\n");
-        fprintf(stderr,"-bs == change the size of the packets\n");
+        fprintf(stderr, "Network stress tester - sends packets with a \
+repeating value and a crc32 until\nit receives a mismatch between the received\
+ and calculated crc\n");
+        fprintf(stderr,"\t-ro\n\t\tread only\n");
+        fprintf(stderr,"\t-wo\n\t\twrite only\n");
+        fprintf(stderr,"\t-l\n\t\tlisten on port# given\n");
+        fprintf(stderr,"\t-c\n\t\tconnect to host on port number given\n");
+        fprintf(stderr,"\t-bs\n\t\tchange the size of the packets\n");
         exit(1);
     }
 
@@ -113,6 +114,7 @@ value and a crc32 until it receives a mismatch between the received and sent crc
         }
     }
 
+    /* Initialize the CRC lookup table */
     initializeCRC();
 
     /* Setup sockfd to hold the needed info */
@@ -166,6 +168,9 @@ value and a crc32 until it receives a mismatch between the received and sent crc
             printf("Could not join the sending thread.\n");
             return ret;
         }
+
+        pcount= *((unsigned int *)thr_ret);
+        printf("Got bad packet after sending %u packets.\n", pcount);
     }
 
     if(!wo) {
@@ -174,13 +179,13 @@ value and a crc32 until it receives a mismatch between the received and sent crc
             printf("Could not join the receiving thread.\n");
             return ret;
         }
+
+        pcount= *((unsigned int *)thr_ret);
+        printf("Got bad packet after receiving %u packets.\n", pcount);
     }
 
-    pcount= *((unsigned int *)thr_ret);
-
-    printf("Got bad packet after %u packets.\n", pcount);
-
-    /* Clean up the sockets when we're finished */
+    /* Clean up the sockets when we're finished. This is us trying to be as
+       nice and adherent to standards as possible. */
     if(ro) {
         shutdown(sockfd, SHUT_RD);
     } else if(wo) {
@@ -188,8 +193,11 @@ value and a crc32 until it receives a mismatch between the received and sent crc
     } else {
         shutdown(sockfd, SHUT_RDWR);
     }
+
+    /* Close the socket */
     close(sockfd);
-    close(bindsockfd);
+    if(server)
+        close(bindsockfd);
 
     return 0;
 } /* }}} */

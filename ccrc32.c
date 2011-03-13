@@ -65,16 +65,13 @@ void partialCRC(uint32_t *ulCRC, const unsigned char *sData,
 {
     while(ulDataLength--)
     {
-        //If your compiler complains about the following line, try changing each
-        //    occurrence of *ulCRC with "((uint32_t)*ulCRC)" or "*(uint32_t *)ulCRC".
-
          *(uint32_t *)ulCRC =
             ((*(uint32_t *)ulCRC) >> 8) ^ ulTable[((*(uint32_t *)ulCRC) & 0xFF) ^ *sData++];
     }
 }
 
 /*
-    Returns the calculated CRC23 for the given string.
+    Returns the calculated CRC32 for the given string.
 */
 
 uint32_t fullCRC(const unsigned char *sData, uint32_t ulDataLength)

@@ -45,10 +45,10 @@ int set_bufsize(size_t new_sz) {
 
 /* {{{ parse_packet - takes in a packet and checks that the first 8 bytes match
  *                then checks that the CRCs match
- * in:  a pointer to a packet and the length of that packet
+ * in:  a pointer to a packet and the length of that packet, optionally a crc (or 0)
  * out: 0 on success
  */
-int parse_packet(const unsigned char *buffer, size_t length)
+int parse_packet(const unsigned char *buffer, size_t length, uint32_t g_crc)
 {
     int i;
     uint32_t crc, reccrc;
@@ -65,14 +65,17 @@ int parse_packet(const unsigned char *buffer, size_t length)
         }
     }
 
-    /* Compute the crc */
-    crc= fullCRC(buffer, length - 4);
-
     /* Read in the crc which we received */
     reccrc= buffer[length - 4];
     reccrc= (reccrc << 8) | buffer[length - 3];
     reccrc= (reccrc << 8) | buffer[length - 2];
     reccrc= (reccrc << 8) | buffer[length - 1];
+
+    if(g_crc == 0) {
+        /* Compute the crc */
+        crc= fullCRC(buffer, length - 4);
+    } else
+        crc= g_crc;
 
     if(reccrc != crc) {
         printf("crc32 differed.\nreceived: %"PRIx32"\nbut calculated:  %"PRIx32"\n",
@@ -199,6 +202,7 @@ void *recv_check(void *fd)
     int ourfd= *(int *)fd;
     size_t n, ret, max= (bufsize >> 1);
     unsigned char *buffer= malloc(bufsize * sizeof(*buffer));
+    uint32_t crc;
 
     if(buffer == NULL) {
         printf("Could not allocate space for receive buffer!\n");
@@ -211,16 +215,34 @@ void *recv_check(void *fd)
     /* Loop until we receive bad data */
     while(lastgood) {
         n= 0; ret= 1;
+        crc= 0xffffffff; /* Initialize the crc */
 
         /* We may not read a whole packet in one read, so loop */
-        while(n < max && ret > 0)
+        while(n < max && ret > 0) {
             n+= ret= read(ourfd, buffer + n, max - n);
+
+            /* Do the partial CRC calculation */
+            if(ret > 0 && n < (max - 4)) {
+                partialCRC(&crc, buffer + n - ret, ret);
+            } else if((ret - 4) > 0 && n >= (max - 4)) {
+                partialCRC(&crc, buffer + n - ret, ret - 4);
+            }
+        }
+
+        crc= (crc ^ 0xffffffff);
 
         if(ret < 0)
             error("ERROR reading from socket\n");
 
         preccount++; /* indicate we got another packet */
-        lastgood= !parse_packet(buffer, n); /* check if it's good */
+        if(n < max) {
+            printf("Got truncated packet.\n");
+            lastgood= 0;
+
+            break;
+        }
+
+        lastgood= !parse_packet(buffer, n, crc); /* check if it's good */
     }
 
     /* If we made it here then the packet was bad */
