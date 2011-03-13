@@ -1,19 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <stdint.h>
-#include <string.h>
-#include <pthread.h>
 #include <inttypes.h>
+#include <unistd.h>
+#include <pthread.h>
 #include "packets.h"
 #include "ccrc32.h"
 
+/* Defines the default buffer size */
 #define DEFAULT_BUFSZ 0x10000
 
 /* The global variables */
-static int lastgood= 1;
-static unsigned int preccount= 0, psndcount= 0;
-static size_t bufsize= DEFAULT_BUFSZ;
+static int lastgood= 1; /* Whether the last packet received was valid */
+static unsigned int preccount= 0, psndcount= 0; /* Packet sent/received count */
+static size_t bufsize= DEFAULT_BUFSZ; /* The buffer size reference throughout */
 
 /* Some stuff which is easy to identify in a packet dump */
 static const char stuff[]= {0xAB, 0xAD, 0xBA, 0xBE,
