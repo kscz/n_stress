@@ -4,7 +4,7 @@ Simple program designed to saturate a network connection.  Currently it works
 very well at crashing poorly programmed routers (the D-Link DIR-655), and
 revealing bugs in kernel drivers for gigabit ethernet cards.
 
-It's released under GNU GPLv3 (you can read more in the license file).
+It's released under GNU LGPLv3 (you can read more in the license file).
 
 Have fun!
 
