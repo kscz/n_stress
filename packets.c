@@ -199,7 +199,7 @@ void *send_check(void *fd)
 void *recv_check(void *fd)
 {
     int ourfd= *(int *)fd;
-    size_t n, ret, max= (bufsize >> 1);
+    size_t n = 0, ret = 1, max= (bufsize >> 1);
     unsigned char *buffer= malloc(bufsize * sizeof(*buffer));
     uint32_t crc;
 
