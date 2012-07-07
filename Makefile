@@ -1,11 +1,14 @@
 CC = gcc
 CFLAGS = -Wall
 LDFLAGS = -lpthread
-ifeq (${DEBUG}, yes)
+DEBUG ?= NO
+
+ifeq (${DEBUG}, NO)
+  CFLAGS += -Werror
+  OPTIMIZATION = -O2
+else
   CFLAGS += -g
   OPTIMIZATION = -O0
-else
-  OPTIMIZATION = -O2
 endif
 
 all: n_stress
