@@ -201,7 +201,6 @@ void *recv_check(void *fd)
     int ourfd= *(int *)fd;
     size_t n = 0, ret = 1, max= (bufsize >> 1);
     unsigned char *buffer= malloc(bufsize * sizeof(*buffer));
-    uint32_t crc;
 
     if(buffer == NULL) {
         printf("Could not allocate space for receive buffer!\n");
@@ -214,21 +213,11 @@ void *recv_check(void *fd)
     /* Loop until we receive bad data */
     while(lastgood) {
         n= 0; ret= 1;
-        crc= 0xffffffff; /* Initialize the crc */
 
         /* We may not read a whole packet in one read, so loop */
         while(n < max && ret > 0) {
             n+= ret= read(ourfd, buffer + n, max - n);
-
-            /* Do the partial CRC calculation */
-            if(ret > 0 && n < (max - 4)) {
-                partialCRC(&crc, buffer + n - ret, ret);
-            } else if((ret - 4) > 0 && n >= (max - 4)) {
-                partialCRC(&crc, buffer + n - ret, ret - 4);
-            }
         }
-
-        crc= (crc ^ 0xffffffff);
 
         if(ret < 0)
             error("ERROR reading from socket\n");
@@ -241,7 +230,7 @@ void *recv_check(void *fd)
             break;
         }
 
-        lastgood= !parse_packet(buffer, n, crc); /* check if it's good */
+        lastgood= !parse_packet(buffer, n, 0); /* check if it's good, doing full CRC */
     }
 
     /* If we made it here then the packet was bad */
