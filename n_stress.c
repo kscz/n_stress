@@ -21,7 +21,7 @@
 void make_socket_and_bind(unsigned int *, struct sockaddr_in *, int);
 void make_socket_and_connect(unsigned int *, const char *, const char *);
 
-/* {{{ main - sets up everything and starts the threads which spew
+/* main - sets up everything and starts the threads which spew
  * in: command line arguments
  * out: 0 on success
  */
@@ -200,9 +200,9 @@ repeating value and a crc32 until\nit receives a mismatch between the received\
         close(bindsockfd);
 
     return 0;
-} /* }}} */
+}
 
-/* {{{ make_socket_and_bind - creates and binds to a socket on portnum
+/* make_socket_and_bind - creates and binds to a socket on portnum
  * in: pointer to an fd, the sockaddr struct, and the port number
  * out: nothing (exits on failure)
  */
@@ -226,9 +226,9 @@ void make_socket_and_bind(unsigned int *sockfd,
     if(bind(*sockfd, (struct sockaddr *)serv_addr,
         sizeof(*serv_addr)) < 0) 
         error("ERROR on binding");
-} /* }}} */
+}
 
-/* {{{ make_socket_and_connect - make a socket fd and connect it to the host
+/* make_socket_and_connect - make a socket fd and connect it to the host
  * in: pointer to the fd to fill, the string with the server name, and the port #
  * out: nothing (exits on failure)
  */
@@ -271,4 +271,4 @@ void make_socket_and_connect(unsigned int *sockfd, const char* server,
 
     /* We're all connected, go ahead and return. */
     freeaddrinfo(result);
-} /* }}} */
+}

@@ -22,16 +22,16 @@ static const char stuff[]= {0xAB, 0xAD, 0xBA, 0xBE,
                             0x01, 0x23, 0x45, 0x67,
                             0x89, 0xAB, 0xCD, 0xEF};
 
-/* {{{ error - use perror to display a message then exit
+/* error - use perror to display a message then exit
  * in:  a string to display
  * out: does not return
  */
 void error(const char *msg) {
     perror(msg);
     exit(1);
-} /* }}} */
+}
 
-/* {{{ set_bufsize - set the buffer size which will be used
+/* set_bufsize - set the buffer size which will be used
  * in:  a size
  * out: 0 on success
  */
@@ -40,9 +40,9 @@ int set_bufsize(size_t new_sz) {
     bufsize= new_sz;
 
     return 0;
-} /* }}} */
+}
 
-/* {{{ parse_packet - takes in a packet and checks that the first 8 bytes match
+/* parse_packet - takes in a packet and checks that the first 8 bytes match
  *                then checks that the CRCs match
  * in:  a pointer to a packet and the length of that packet, optionally a crc (or 0)
  * out: 0 on success
@@ -83,9 +83,9 @@ int parse_packet(const unsigned char *buffer, size_t length, uint32_t g_crc)
     }
 
     return 0;
-} /* }}} */
+}
 
-/* {{{ generate_packet - make a packet which conforms to our "rules"
+/* generate_packet - make a packet which conforms to our "rules"
  * in: a buffer to store the packet in, and its size
  * out: 0 on success
  */
@@ -128,9 +128,9 @@ int generate_packet(unsigned char *buffer, size_t buffersize)
     buffer[i++]= (crc & 0xff);
 
     return 0;
-} /* }}} */
+}
 
-/* {{{ print_packet - dump out all the bytes of the packet for inspection
+/* print_packet - dump out all the bytes of the packet for inspection
  * in:  buffer of chars to print, and the number of chars
  * out: nothing
  */
@@ -149,9 +149,9 @@ void print_packet(const unsigned char *buffer, size_t length)
     }
 
     printf("\n\n");
-} /* }}} */
+}
 
-/* {{{ send_check - The function which simply loops dumping packets into fd
+/* send_check - The function which simply loops dumping packets into fd
  * in: pointer to a file descriptor to dump to
  * out: nothing
  */
@@ -190,9 +190,9 @@ void *send_check(void *fd)
     free(buffer); /* Clean up after ourselves! */
 
     return (void *)&psndcount;
-} /* }}} */
+}
 
-/* {{{ recv_check - Function called by pthread_create to receive and check packets
+/* recv_check - Function called by pthread_create to receive and check packets
  * in:  a pointer to a file descriptor
  * out: the number of packets received, or 0xFFFF on failure
  */
@@ -241,4 +241,4 @@ void *recv_check(void *fd)
 
     /* return the number of packets we got */
     return (void *)&preccount;
-} /* }}} */
+}
