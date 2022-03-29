@@ -37,11 +37,11 @@ int main(int argc, char *argv[]) {
 
     /* Check if we have a valid number of arguments */
     if (argc < 2 || argc > 9) {
-        fprintf(stderr,"Usage: %s [-l portnum] [-ro] [-wo] [-c host portnum] \
-[-bs buffer size]\n", argv[0]);
-        fprintf(stderr, "Network stress tester - sends packets with a \
-repeating value and a crc32 until\nit receives a mismatch between the received\
- and calculated crc\n");
+        fprintf(stderr,"Usage: %s [-l portnum] [-ro] [-wo] [-c host portnum] "
+                "[-bs buffer size]\n", argv[0]);
+        fprintf(stderr, "Network stress tester - sends packets with a "
+                "repeating value and a crc32 until\nit receives a mismatch "
+                "between the received and calculated crc\n");
         fprintf(stderr,"\t-ro\n\t\tread only\n");
         fprintf(stderr,"\t-wo\n\t\twrite only\n");
         fprintf(stderr,"\t-l\n\t\tlisten on port# given\n");
@@ -140,10 +140,12 @@ repeating value and a crc32 until\nit receives a mismatch between the received\
 
     /* This honestly won't do anything, it's just polite */
     /* I hoped it would make two write-only clients stop.  I was wrong */
-    if(ro)
+    if(ro) {
         shutdown(sockfd, SHUT_WR);
-    if(wo)
+    }
+    if(wo) {
         shutdown(sockfd, SHUT_RD);
+    }
 
     /* Try and make the threads */
     if(!ro) {
@@ -161,6 +163,8 @@ repeating value and a crc32 until\nit receives a mismatch between the received\
             return ret;
         }
     }
+
+    fprintf(stderr, "Press control+c to exit...\n");
 
     /* Wait for the threads to complete */
     if(!ro) {
