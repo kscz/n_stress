@@ -27,7 +27,11 @@ Please note that this project could really use a few rounds of cleanup -
   be a `SIGINT` handler which alerts the threads they should shutdown
 * There should absolutely be unit tests somewhere in here
 
-It's released under GNU LGPLv3 (you can read more in the license file).
+It's released under GNU LGPLv3 (you can read more in the license file)
+
+The ccrc32.c and ccrc32.h files had no author attribution at the time
+of download, but they were downloaded from
+[here](http://www.networkdls.com/Software.Asp?Review=22)
 
 Have fun!
 
