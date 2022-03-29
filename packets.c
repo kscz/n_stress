@@ -115,7 +115,7 @@ int generate_packet(unsigned char *buffer, size_t buffersize)
     }
 
     /* Make the next set of junk different (cycle through "stuff") */
-    currentjunk= (currentjunk + 4) % (sizeof(buffer)/sizeof(*buffer));
+    currentjunk= (currentjunk + 4) % (sizeof(stuff)/sizeof(*stuff));;
 
     /* Calculate the CRC */
     crc= fullCRC(buffer, buffersize - 4);
@@ -158,7 +158,7 @@ void print_packet(const unsigned char *buffer, size_t length)
 void *send_check(void *fd)
 {
     int ourfd= *(int *)fd;
-    size_t ret, n, max= (bufsize >> 1);
+    ssize_t ret, n, max= (bufsize >> 1);
     unsigned char *buffer= malloc(bufsize * sizeof(*buffer));
 
     if(buffer == NULL) {
@@ -168,13 +168,14 @@ void *send_check(void *fd)
 
     /* Loop until we get bad data */
     while(lastgood) {
-        n= 0; ret= 1;
+        n= 0;
 
         generate_packet(buffer, (bufsize >> 1));
 
         /* We may not write all the data in one go so loop */
-        while(n < max && ret > 0)
+        do {
             n+= ret= write(ourfd, buffer + n, max - n);
+        } while(n < max && ret > 0);
 
         psndcount++;
 
@@ -199,7 +200,7 @@ void *send_check(void *fd)
 void *recv_check(void *fd)
 {
     int ourfd= *(int *)fd;
-    size_t n = 0, ret = 1, max= (bufsize >> 1);
+    ssize_t n = 0, ret = 1, max= (bufsize >> 1);
     unsigned char *buffer= malloc(bufsize * sizeof(*buffer));
 
     if(buffer == NULL) {
@@ -212,12 +213,12 @@ void *recv_check(void *fd)
 
     /* Loop until we receive bad data */
     while(lastgood) {
-        n= 0; ret= 1;
+        n= 0;
 
         /* We may not read a whole packet in one read, so loop */
-        while(n < max && ret > 0) {
+        do {
             n+= ret= read(ourfd, buffer + n, max - n);
-        }
+        } while(n < max && ret > 0);
 
         if(ret < 0)
             error("ERROR reading from socket\n");

@@ -18,17 +18,18 @@
 #include "ccrc32.h"
 
 /* Prototype(s) */
-void make_socket_and_bind(unsigned int *, struct sockaddr_in *, int);
-void make_socket_and_connect(unsigned int *, const char *, const char *);
+void make_socket_and_bind(int *, struct sockaddr_in *, int);
+void make_socket_and_connect(int *, const char *, const char *);
 
 /* main - sets up everything and starts the threads which spew
  * in: command line arguments
  * out: 0 on success
  */
 int main(int argc, char *argv[]) {
-    unsigned int sockfd, bindsockfd, clilen;
+    int ret, sockfd, bindsockfd;
+    socklen_t clilen;
     struct sockaddr_in serv_addr, cli_addr;
-    unsigned int ret, pcount= 0;
+    unsigned int pcount= 0;
     pthread_t send_thread, recv_thread;
     void *thr_ret;
     int ro= 0, wo= 0, client= 0, server= 0, portnum= 0;
@@ -206,7 +207,7 @@ repeating value and a crc32 until\nit receives a mismatch between the received\
  * in: pointer to an fd, the sockaddr struct, and the port number
  * out: nothing (exits on failure)
  */
-void make_socket_and_bind(unsigned int *sockfd,
+void make_socket_and_bind(int *sockfd,
         struct sockaddr_in *serv_addr, int portnum)
 {
     /* Generate the socket */
@@ -232,7 +233,7 @@ void make_socket_and_bind(unsigned int *sockfd,
  * in: pointer to the fd to fill, the string with the server name, and the port #
  * out: nothing (exits on failure)
  */
-void make_socket_and_connect(unsigned int *sockfd, const char* server,
+void make_socket_and_connect(int *sockfd, const char* server,
         const char *port)
 {
     struct addrinfo hints;

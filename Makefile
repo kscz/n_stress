@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -Wall
-LDFLAGS = -lpthread
+CFLAGS = -Wall -Wextra
+LDFLAGS = -pthread
 DEBUG ?= NO
 
 ifeq (${DEBUG}, NO)
